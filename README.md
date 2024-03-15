@@ -43,10 +43,13 @@ EOF
 
 think about the changes you need to make, especially to the several variables
 
-### Firewall
+### Publish
 
 On host OS and its network, you should expose or redirect to its `localhost:3101`
-and add security. Change grafana dashboard password. Allowlist your IP from which you're accessing it. etc
+
+### Security
+
+Add security. Change grafana dashboard password. Allowlist your IP from which you're accessing it. etc
 
 
 ## Deploy
@@ -70,7 +73,7 @@ username: admin
 password: admin
 ```
 
-The configuration adds a data source for Loki in Grafana. Just click Explore, select Loki, start querying your logs.
+The configuration adds a data source for Loki in Grafana. Just click Explore, select Loki, and start querying your logs.
 
 
 ## TODO
