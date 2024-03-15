@@ -29,13 +29,10 @@ you just need to define a few variables used in the playbook and this one way to
 ```shell
 # writes to inventory.ini in $PWD
 cat > inventory.ini << EOF
-[all:vars]
-logs_app_host=my_host_group
-
-[my_host_group]
+[my_host]
 127.0.0.1 # your remote server IP, not loopback
 
-[my_host_group:vars]
+[my_host:vars]
 domain=example.com
 ansible_user=my_user
 EOF
@@ -58,7 +55,7 @@ Run the ansible playbook from your local development OS
 
 Something like
 ```shell
-ansible-playbook -i inventory.ini logs.playbook.yml
+ansible-playbook -i inventory.ini --extra-vars logs_app_host=my_host logs.playbook.yml
 ```
 
 

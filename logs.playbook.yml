@@ -1,5 +1,5 @@
 - name: logs-app
-  hosts: logs_app_host
+  hosts: "{{ logs_app_host }}"
   vars:
     remote_dir: "/home/{{ ansible_user }}/{{ domain }}/logs-app"
   tasks:
