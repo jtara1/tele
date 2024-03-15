@@ -64,9 +64,11 @@ ansible-playbook -i inventory.ini logs.playbook.yml
 Go to your remote host OS public IP that redirects to/exposes its localhost:3101
 Login to the dashboard.
 
-defaults:
+default Grafana dashboard (port 3101) login:
+```text
 username: admin
 password: admin
+```
 
 The configuration adds a data source for Loki in Grafana. Just click Explore, select Loki, start querying your logs.
 
