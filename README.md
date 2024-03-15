@@ -49,7 +49,7 @@ and add security. Change grafana dashboard password. Allowlist your IP from whic
 
 ## Deploy
 
-Run the ansible playbook from your local dev computer
+Run the ansible playbook from your local development OS
 
 Something like
 ```shell
