@@ -41,6 +41,8 @@ ansible_user=my_user
 EOF
 ```
 
+think about the changes you need to make, especially to the several variables
+
 ### Firewall
 
 On host OS and its network, you should expose or redirect to its `localhost:3101`
