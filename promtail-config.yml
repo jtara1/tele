@@ -1,0 +1,60 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/promtail/positions.yaml
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: apps-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: apps-logs
+          __path__: /var/log/containers/*/*json.log
+    pipeline_stages:
+      - docker: {}
+      - match:
+          source: output
+          selector: '{job="apps-logs"} |= "^\\{"' # starts with {
+          stages:
+            - json:
+                source: output
+                expressions:
+                  hostname: "hostname"
+                  time: "time"
+                  msg: "msg"
+                  level: "level"
+            - labels:
+                ts:
+                msg:
+                level:
+                hostname:
+                time:
+
+  - job_name: nginx-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx-logs
+          __path__: /var/log/nginx/access.log
+    pipeline_stages:
+      - match:
+          selector: '{job="nginx-logs"}'
+          stages:
+            - regex:
+                expression: '^(?P<remote_addr>[^ ]*) - (?P<remote_user>[^ ]*) \[(?P<time_local>[^\]]*)\] "(?P<request>[^"]*)" (?P<status>[^ ]*) (?P<body_bytes_sent>[^ ]*) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"$'
+            - labels:
+                remote_addr:
+                remote_user:
+                time_local:
+                request:
+                status:
+                body_bytes_sent:
+                http_referer:
+                http_user_agent:
