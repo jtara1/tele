@@ -19,16 +19,3 @@ services:
     depends_on:
       - loki
 
-  promtail:
-    image: grafana/promtail:main
-    volumes:
-      - /etc/machine-id:/etc/machine-id:ro
-      - ./promtail-config.yml:/etc/promtail/config.yml:ro
-      - /tmp:/tmp
-      - /home/${HOST_USER:-j}/.local/share/docker/containers:/var/log/containers:ro
-      - /var/log/nginx:/var/log/nginx:ro
-      - ./promtail-entrypoint.sh:/usr/bin/promtail-entrypoint.sh:ro
-    command: -config.file=/etc/promtail/config.yml -log.level=info
-    restart: unless-stopped
-    depends_on:
-      - loki

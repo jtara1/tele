@@ -58,6 +58,13 @@ Something like
 ansible-playbook -i inventory.ini --extra-vars logs_app_host=my_host logs.playbook.yml
 ```
 
+### Run promtail
+
+```shell
+domain=example.com # change this
+promtail -config.file="$HOME/$domain/logs-app/promtail-config.yml" -log.level=info
+```
+
 
 ## Usage
 
