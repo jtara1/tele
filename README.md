@@ -7,7 +7,7 @@ automatically ingest logs from (rootless) docker and nginx access logs with dash
 
 work in progress
 
-I've made this for specific setup with support for others through several variables.
+I've made this for specific setup with support for other people through several variables.
 
 This was pulled out of another project of mine and needs to be re-tested.
 
