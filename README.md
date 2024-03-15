@@ -27,7 +27,7 @@ ansible
 you just need to define a few variables used in the playbook and this one way to do so
 
 ```shell
-# writes to `inventory.ini` in $PWD
+# writes to inventory.ini in $PWD
 cat > inventory.ini << EOF
 [all:vars]
 logs_app_host=my_host_group
