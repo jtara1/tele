@@ -6,6 +6,8 @@
   outputs = { self, nixpkgs, ... } @ inputs: {
     nixosModules.default = { config, lib, ... }:
     let
+      cfg = config.virtualisation.docker.rootless;
+
       dockerLokiSettings = {
          log-driver = lib.mkDefault "loki";
          log-opts = {
@@ -30,32 +32,15 @@
     in
     {
       options = {};
-      config = lib.mkIf (config.virtualisation.docker.rootless.enable) {
-        # enable docker loki plugin in docker daemon.json (settings); let user overwrite daemon.json in merge
+      config = lib.mkIf (cfg.enable) {
+        # enable docker loki plugin in docker daemon.json (settings)
+        # let user overwrite daemon.json in merge
         virtualisation.docker.rootless.daemon.settings = lib.mkMerge [
           dockerLokiSettings
-          config.virtualisation.docker.rootless.customSettings or {}
+#          existingDaemonSettings
         ];
 
         systemd.services = {
-          dockerRootlessRestart = {
-            wantedBy = [ "multi-user.target" ];
-            after = [ "docker.service" ];
-            requires = [ "docker.service" ];
-            description = "Restart docker service after nixos-rebuild switch.";
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = ''
-                /bin/sh -c '
-                  if ! systemctl --user is-active --quiet docker; then
-                    echo systemd dockerRootlessRestart is restarting docker
-                    systemctl --user restart docker
-                  fi
-                '
-              '';
-            };
-          };
-
           dockerPluginLokiInstall = {
             wantedBy = [ "multi-user.target" ];
             after = [ "docker.service" ];
