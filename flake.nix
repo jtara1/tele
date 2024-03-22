@@ -4,46 +4,38 @@
   };
 
   outputs = { self, nixpkgs, ... } @ inputs: {
-    nixosModules.default = { config, lib, ... }:
-    let
-      cfg = config.virtualisation.docker.rootless;
-
-      dockerLokiSettings = {
-         log-driver = lib.mkDefault "loki";
-         log-opts = {
-           # in general, for json-line logs with properties
-           labels = "level,msg,ts";
-           # for loki
-           loki-url = "http://localhost:3100/loki/api/v1/push";
-           loki-batch-size = "400";
-           loki-pipeline-stages = ''
-             - json:
-                 expressions:
-                   level: level
-                   msg: msg
-                   ts: ts
-             - labels:
-                 level: level
-                 msg: msg
-                 ts: ts
-           '';
-         };
-       };
-    in
-    {
+    nixosModules.default = { config, lib, ... }: {
       options = {};
-      config = lib.mkIf (cfg.enable) {
+      config = lib.mkIf (config.virtualisation.docker.rootless.enable) {
         # enable docker loki plugin in docker daemon.json (settings)
-        # let user overwrite daemon.json in merge
-        virtualisation.docker.rootless.daemon.settings = lib.mkMerge [
-          dockerLokiSettings
-#          existingDaemonSettings
-        ];
+        virtualisation.docker.rootless.daemon.settings = {
+          log-driver = lib.mkDefault "loki";
+          log-opts = {
+            # in general, for json-line logs with properties
+            labels = "level,msg,ts";
+            # for loki
+            loki-url = "http://localhost:3100/loki/api/v1/push";
+            loki-batch-size = "400";
+            loki-pipeline-stages = ''
+              - json:
+                  expressions:
+                    level: level
+                    msg: msg
+                    ts: ts
+              - labels:
+                  level: level
+                  msg: msg
+                  ts: ts
+            '';
+          };
+        };
 
         systemd.services = {
+          # TODO: This needs more testing. Is docker available before docker.service? but after the service would err out bc daemon.json requires loki plugin
+          # the `docker plugin install` should just be done manually until further testing/fix
           dockerPluginLokiInstall = {
             wantedBy = [ "multi-user.target" ];
-            after = [ "docker.service" ];
+            before = [ "docker.service" ];
             requires = [ "docker.service" ];
             description = "Install docker plugin, loki.";
             serviceConfig = {
