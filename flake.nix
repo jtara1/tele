@@ -6,11 +6,15 @@
   outputs = { self, nixpkgs, ... } @ inputs: {
     nixosModules.default = { config, lib, ... }: {
       options = {};
-      config = lib.mkIf (config.virtualisation.docker.rootless.enable) {
+      config =
+      let
+        dockerEnabled = config.virtualisation.docker.rootless.enable;
+      in
+      lib.mkIf (dockerEnabled) {
         # --- run loki
         services.loki = {
           enable = true;
-          useLocally = true; # simplification assumption - logs-app runs local to apps
+          configFile = ./loki-config.yml;
         };
 
         # --- run grafana
@@ -24,18 +28,14 @@
           };
           provision = {
             enable = true;
-            datasources.apiVersion = 1;
-            datasources.settings = [
-              {
+            datasources.settings = {
+              datasources = [{
                 name = "Loki";
                 type = "loki";
-                access = "proxy";
                 url = "http://localhost:3100";
-                jsonData.maxLines = 1000;
-                jsonData.tlsSkipVerify = true;
-                isDefault = true;
-              }
-            ];
+                apiVersion = 1;
+              }];
+            };
           };
         };
 

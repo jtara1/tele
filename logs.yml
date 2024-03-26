@@ -18,4 +18,3 @@ services:
     restart: unless-stopped
     depends_on:
       - loki
-
