@@ -94,3 +94,9 @@ The configuration adds a data source for Loki in Grafana. Just click Explore, se
 
 I was running the 3 in docker containers. Now, I'm running promtail directly on host OS.
 Later, I may switch to running the 3 through nixos config.
+
+
+## References
+
+- [nix configs: grafana, prometheus, loki using journald as log driver](https://xeiaso.net/blog/prometheus-grafana-loki-nixos-2020-11-20/)
+- [nix config: grafana](https://discourse.nixos.org/t/how-to-use-exported-grafana-dashboard/27739/2?u=jtara1)
