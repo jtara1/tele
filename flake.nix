@@ -3,7 +3,12 @@
     nixpkgs.url = "github:NixOS/nixpkgs"; # unstable nixpkgs
   };
 
-  outputs = { self, nixpkgs, ... } @ inputs: {
+  outputs = { self, nixpkgs, ... } @ inputs:
+  let
+    system = "x86_64-linux";
+    pkgsUnstable = import nixpkgs { inherit system; };
+  in
+  {
     nixosModules.default = { config, lib, ... }: {
       options = {};
       config =
@@ -11,75 +16,86 @@
         dockerEnabled = config.virtualisation.docker.rootless.enable;
       in
       lib.mkIf (dockerEnabled) {
+        # --- run prometheus
+        services.prometheus = {
+          enable = true;
+          port = 9001;
+          exporters = {
+            node = {
+              enable = true;
+              enabledCollectors = [ "systemd" ];
+              port = 9002;
+            };
+          };
+          scrapeConfigs = [
+            {
+              job_name = "system";
+              static_configs = [{
+                targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.node.port}" ];
+              }];
+            }
+          ];
+        };
+
         # --- run loki
         services.loki = {
           enable = true;
           configFile = ./loki-config.yml;
         };
 
-        # --- run grafana
-        services.grafana = {
-          enable = true;
-          settings = {
-            security = {
-              admin_user = "admin";
-              admin_password = "admin"; # FIXME: parameterize through build args or options
-            };
-          };
-          provision = {
-            enable = true;
-            datasources.settings = {
-              datasources = [{
-                name = "Loki";
-                type = "loki";
-                url = "http://localhost:3100";
-                apiVersion = 1;
-              }];
-            };
-          };
-        };
+        # --- run promtail
+        systemd.services.promtail = {
+          description = "Promtail service for Loki";
+          wantedBy = [ "multi-user.target" ];
 
-        # --- in docker daemon.json (settings), enable docker loki plugin
-        virtualisation.docker.rootless.daemon.settings = {
-          log-driver = lib.mkDefault "loki";
-          log-opts = {
-            # in general, for json-line logs with properties
-            labels = "level,msg,ts";
-            # for loki
-            loki-url = "http://localhost:3100/loki/api/v1/push";
-            loki-batch-size = "400";
-            loki-pipeline-stages = ''
-              - json:
-                  expressions:
-                    level: level
-                    msg: msg
-                    ts: ts
-              - labels:
-                  level: level
-                  msg: msg
-                  ts: ts
+          serviceConfig = {
+            ExecStart = ''
+              ${pkgsUnstable.grafana-loki}/bin/promtail --config.file ${./promtail-config.yml}
             '';
           };
         };
 
-        # --- systemd oneshot to install docker loki plugin
-        systemd.services = {
-          # TODO: This needs more testing. Is docker available before docker.service? but after the service would err out bc daemon.json requires loki plugin
-          # the `docker plugin install` should just be done manually until further testing/fix
-          dockerPluginLokiInstall = {
-            wantedBy = [ "multi-user.target" ];
-            before = [ "docker.service" ];
-            requires = [ "docker.service" ];
-            description = "Install docker plugin, loki.";
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = ''
-                /bin/sh -c '
-                  if ! docker plugin ls --filter enabled=true | grep -q loki; then
-                    docker plugin install grafana/loki-docker-driver:2.9.4 --alias loki --grant-all-permissions
-                  fi
-                '
-              '';
+        # --- configurat docker logs for promtail to ingest logs
+        virtualisation.docker.rootless.daemon.settings = {
+          log-driver = lib.mkDefault "journald";
+          log-opts = {
+            labels = "level,msg,ts"; # for application logs formatted as json-lines
+            tag = "{{.Name}}"; # container name instead of container id
+          };
+        };
+
+        # --- run grafana
+        services.grafana = {
+          enable = true;
+#          domain = "example.com";
+
+          settings = {
+            server = {
+              http_port = 2342;
+              http_addr = "127.0.0.1";
+            };
+            security = {
+              admin_user = "admin";
+              admin_password = "admin"; # default. admin can change upon logging in
+            };
+          };
+
+          provision = {
+            enable = true;
+            datasources.settings = {
+              datasources = [
+                {
+                  name = "Prometheus";
+                  type = "prometheus";
+                  url = "http://127.0.0.1:9001";
+                }
+                {
+                  name = "Loki";
+                  type = "loki";
+                  url = "http://127.0.0.1:3100";
+                  apiVersion = 1;
+                }
+              ];
             };
           };
         };
