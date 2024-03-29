@@ -35,29 +35,12 @@ On host OS and its network, you should expose or redirect to its `localhost:3010
 Add security. Change grafana dashboard password. Allowlist your IP from which you're accessing it. etc
 
 
-## Deploy
-
-Run the ansible playbook from your local development OS
-
-Something like
-```shell
-ansible-playbook -i inventory.ini --extra-vars logs_app_host=my_host logs.playbook.yml
-```
-
-### Run promtail
-
-```shell
-domain=example.com # change this
-promtail -config.file="$HOME/$domain/logs-app/promtail-config.yml" -log.level=info
-```
-
-
 ## Usage
 
-Go to your remote host OS public IP that redirects to/exposes its localhost:3010
+Go to the url for grafana, defaults to http://localhost:3010
 Login to the dashboard.
 
-default Grafana dashboard (port 3010) login:
+default login:
 ```text
 username: admin
 password: admin
@@ -73,7 +56,7 @@ The configuration adds a data source for Loki in Grafana. Just click Explore, se
 - [x] nixos config services.promtail
 - [x] relabel docker apps logs for readability (container name instead of container id, the long-hashes)
 - [x] ~~.sh instead of ansible? Makefile instead of ansible?~~ can import nix flake
-- [ ] promtail to ingest logs for non-rootless (default) docker containers (I don't use this so this isn't for me)
+- [ ] promtail to ingest logs for non-rootless (default) docker containers
 - [ ] improve promtail job, docker
 - [ ] re-add nginx access logs pipeline
 - [x] prometheus for system monitoring and metrics
