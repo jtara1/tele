@@ -100,3 +100,4 @@ Later, I may switch to running the 3 through nixos config.
 
 - [nix configs: grafana, prometheus, loki using journald as log driver](https://xeiaso.net/blog/prometheus-grafana-loki-nixos-2020-11-20/)
 - [nix config: grafana](https://discourse.nixos.org/t/how-to-use-exported-grafana-dashboard/27739/2?u=jtara1)
+- [pure nix config for all](https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e)

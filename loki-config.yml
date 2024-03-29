@@ -2,7 +2,8 @@
 auth_enabled: false
 
 server:
-  http_listen_port: 3100
+#  http_listen_port: 3100
+  http_listen_port: 3030
 
 common:
   instance_addr: 127.0.0.1
