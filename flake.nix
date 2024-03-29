@@ -26,7 +26,7 @@
           '';
 
           enable = lib.mkOption {
-            type = types.bool;
+            type = lib.types.bool;
             default = true;
             example = false;
             description = "Enable the Logs App";
@@ -123,32 +123,65 @@
                 config.services.loki.configuration.server.http_listen_port
               }/loki/api/v1/push"; }];
 
-              scrape_configs = [{
-                job_name = "docker";
-                docker_sd_configs = [{
-                  host = "unix:///run/user/1000/docker.sock";
-                  refresh_interval = "5s";
-                }];
-                relabel_configs = [
-                  {
-                    source_labels = [ "__meta_docker_container_name" ];
-                    target_label = "container";
-                    regex = "/(.+)"; # renames /my_container to my_container
-                    replacement = "$1";
-                  }
-                  {
-                    source_labels = [ "__meta_docker_container_log_stream" ];
-                    target_label = "logstream";
-                  }
-                  {
-                    source_labels = [ "__meta_docker_container_image" ];
-                    target_label = "image";
-                  }
-                ];
-                pipeline_stages = [{
-                  docker = { stop_grace_period = "1m"; };
-                }]; # continue to read logs after container exits
-              }];
+              scrape_configs = [
+                # nginx access logs
+                {
+                  job_name = "nginx";
+                  static_configs = [{
+                    targets = ["localhost"];
+                    labels = {
+                      job = "nginx";
+                      __path__ = "/var/log/nginx/access.log";
+                    };
+                  }];
+                  pipeline_stages = [
+                    {
+                      regex = {
+                        expression = ''(?P<remote_addr>[\w\.]+) - (?P<remote_user>[^ ]*) \[(?P<time_local>.*)\] "(?P<request>[^"]*)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"'';
+                      };
+                    }
+                    {
+                      labels = {
+                        remote_addr = ''$.remote_addr'';
+                        remote_user = ''$.remote_user'';
+                        time_local = ''$.time_local'';
+                        request = ''$.request'';
+                        status = ''$.status'';
+                        body_bytes_sent = ''$.body_bytes_sent'';
+                        http_referer = ''$.http_referer'';
+                        http_user_agent = ''$.http_user_agent'';
+                      };
+                    }
+                  ];
+                }
+                # docker (rootless) container logs - tested with docker log-driver = "json-file"
+                {
+                  job_name = "docker";
+                  docker_sd_configs = [{
+                    host = "unix:///run/user/1000/docker.sock";
+                    refresh_interval = "5s";
+                  }];
+                  relabel_configs = [
+                    {
+                      source_labels = [ "__meta_docker_container_name" ];
+                      target_label = "container";
+                      regex = "/(.+)"; # renames /my_container to my_container
+                      replacement = "$1";
+                    }
+                    {
+                      source_labels = [ "__meta_docker_container_log_stream" ];
+                      target_label = "logstream";
+                    }
+                    {
+                      source_labels = [ "__meta_docker_container_image" ];
+                      target_label = "image";
+                    }
+                  ];
+                  pipeline_stages = [{
+                    docker = { stop_grace_period = "1m"; };
+                  }]; # continue to read logs after container exits
+                }
+              ];
             };
             # extraFlags
           };
@@ -188,10 +221,9 @@
           };
 
           # nginx upstreams to alias several services "${ip}:${port}"
-          # note: this isn't defining nginx config (services.nginx)
           # note: this is for use within your system nginx config
           #
-          nginx = {
+          services.nginx = {
             upstreams = {
               "grafana" = {
                 servers = {
@@ -223,7 +255,7 @@
           };
 
           virtualisation.docker.rootless.daemon.settings = {
-            "log-driver" = "json-file";
+            "log-driver" = "json-file"; # tested for compatibility with promtail scrape_config
             "log-opts" = {
               "max-size" = "10m";
               "max-file" = "3";
