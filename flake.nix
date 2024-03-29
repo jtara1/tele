@@ -7,21 +7,38 @@
     let
       system = "x86_64-linux";
       pkgsUnstable = import nixpkgs { inherit system; };
-      cfg = config.services.logs-app;
     in {
-      nixosModules.default = { config, lib, ... }: {
-        options = {
-          services.logs-app = {
+      nixosModules.default = { config, lib, ... }:
+      with lib;
+      let
+      in {
+        options.services.logs-app = {
+          enable = lib.mkOption {
+            type = types.bool;
+            default = true;
+            example = false;
+            description = "Enable the Logs App";
+          };
+
+          network = {
             enable = lib.mkOption {
-              type = types.bool;
-              default = true;
-              example = false;
-              description = "Enable the Logs App";
+              type = types.boo;
+              default = false;
+              example = true;
+              description = "Enable publishing all services from logs-app over the network";
+            };
+
+            ip = lib.mkOption {
+              type = types.string;
+              default = "192.168.1.50";
+              description = "IP to expose over the network for all services for logs-app";
             };
           };
         };
 
-        config = lib.mkIf cfg.enable {
+        config =
+        let cfg = config.services.logs-app;
+        in lib.mkIf cfg.enable {
           # source: (forked) https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e
           # MONITORING: services run on loopback interface
           #             nginx reverse proxy exposes services to network
@@ -149,7 +166,7 @@
             port = 3010;
             # WARNING: this should match nginx setup!
             # prevents "Request origin is not authorized"
-            rootUrl = "http://192.168.1.10:8010"; # helps with nginx / ws / live
+            rootUrl = "http://${cfg.network.ip}:8010"; # helps with nginx / ws / live
 
             protocol = "http";
             addr = "127.0.0.1";
@@ -224,7 +241,7 @@
                 proxyWebsockets = true;
               };
               listen = [{
-                addr = "192.168.1.10";
+                addr = "${cfg.network.ip}";
                 port = 8010;
               }];
             };
@@ -232,17 +249,17 @@
             virtualHosts.prometheus = {
               locations."/".proxyPass = "http://prometheus";
               listen = [{
-                addr = "192.168.1.10";
+                addr = "${cfg.network.ip}";
                 port = 8020;
               }];
             };
 
-            # confirm with http://192.168.1.10:8030/loki/api/v1/status/buildinfo
+            # confirm with http://192.168.1.50:8030/loki/api/v1/status/buildinfo
             #     (or)     /config /metrics /ready
             virtualHosts.loki = {
               locations."/".proxyPass = "http://loki";
               listen = [{
-                addr = "192.168.1.10";
+                addr = "${cfg.network.ip}";
                 port = 8030;
               }];
             };
@@ -250,7 +267,7 @@
             virtualHosts.promtail = {
               locations."/".proxyPass = "http://promtail";
               listen = [{
-                addr = "192.168.1.10";
+                addr = "${cfg.network.ip}";
                 port = 8031;
               }];
             };
