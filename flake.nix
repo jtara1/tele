@@ -8,10 +8,7 @@
       system = "x86_64-linux";
       pkgsUnstable = import nixpkgs { inherit system; };
     in {
-      nixosModules.default = { config, lib, ... }:
-      with lib;
-      let
-      in {
+      nixosModules.default = { config, lib, ... }: {
         options.services.logs-app = {
           mdDoc = ''
             This module provides a configuration for the Logs App service, which is responsible for collecting and managing logs from various sources.
@@ -36,8 +33,7 @@
           };
         };
 
-        config =
-        let cfg = config.services.logs-app;
+        config = let cfg = config.services.logs-app;
         in lib.mkIf cfg.enable {
           # source: (forked) https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e
 
