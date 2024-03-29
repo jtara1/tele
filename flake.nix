@@ -7,12 +7,21 @@
     let
       system = "x86_64-linux";
       pkgsUnstable = import nixpkgs { inherit system; };
+      cfg = config.services.logs-app;
     in {
       nixosModules.default = { config, lib, ... }: {
-        options = { };
-        config =
-          let dockerEnabled = config.virtualisation.docker.rootless.enable;
-          in lib.mkIf (dockerEnabled) {
+        options = {
+          services.logs-app = {
+            enable = lib.mkOption {
+              type = types.bool;
+              default = true;
+              example = false;
+              description = "Enable the Logs App";
+            };
+          };
+        };
+
+        config = lib.mkIf cfg.enable {
             # source: (forked) https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e
             # MONITORING: services run on loopback interface
             #             nginx reverse proxy exposes services to network
