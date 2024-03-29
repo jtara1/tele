@@ -19,35 +19,19 @@
             example = false;
             description = "Enable the Logs App";
           };
-
-          network = {
-            enable = lib.mkOption {
-              type = types.boo;
-              default = false;
-              example = true;
-              description = "Enable publishing all services from logs-app over the network";
-            };
-
-            ip = lib.mkOption {
-              type = types.string;
-              default = "192.168.1.50";
-              description = "IP to expose over the network for all services for logs-app";
-            };
-          };
         };
 
         config =
         let cfg = config.services.logs-app;
         in lib.mkIf cfg.enable {
           # source: (forked) https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e
-          # MONITORING: services run on loopback interface
-          #             nginx reverse proxy exposes services to network
-          #             - grafana:3010
-          #             - prometheus:3020
-          #             - loki:3030
-          #             - promtail:3031
+          # services:
+          #   - grafana http://localhost:3010
+          #   - prometheus http://localhost:3020
+          #   - loki http://localhost:3030
+          #   - promtail http://localhost:3031
 
-          # prometheus: port 3020 (8020)
+          # prometheus: port 3020
           #
           services.prometheus = {
             port = 3020;
@@ -74,7 +58,7 @@
             }];
           };
 
-          # loki: port 3030 (8030)
+          # loki: port 3030
           #
           services.loki = {
             enable = true;
@@ -116,7 +100,7 @@
             # user, group, dataDir, extraFlags, (configFile)
           };
 
-          # promtail: port 3031 (8031)
+          # promtail: port 3031
           #
           services.promtail = {
             enable = true;
@@ -160,14 +144,10 @@
             # extraFlags
           };
 
-          # grafana: port 3010 (8010)
+          # grafana: port 3010
           #
           services.grafana = {
             port = 3010;
-            # WARNING: this should match nginx setup!
-            # prevents "Request origin is not authorized"
-            rootUrl = "http://${cfg.network.ip}:8010"; # helps with nginx / ws / live
-
             protocol = "http";
             addr = "127.0.0.1";
             analytics.reporting.enable = false;
@@ -198,14 +178,11 @@
             };
           };
 
-          # nginx reverse proxy
-          services.nginx = {
-            enable = true;
-            recommendedProxySettings = true;
-            recommendedOptimisation = true;
-            recommendedGzipSettings = true;
-            # recommendedTlsSettings = true;
-
+          # nginx upstreams to alias several services "${ip}:${port}"
+          # note: this isn't defining nginx config (services.nginx)
+          # note: this is for use within your system nginx config
+          #
+          nginx = {
             upstreams = {
               "grafana" = {
                 servers = {
@@ -233,43 +210,6 @@
                   }" = { };
                 };
               };
-            };
-
-            virtualHosts.grafana = {
-              locations."/" = {
-                proxyPass = "http://grafana";
-                proxyWebsockets = true;
-              };
-              listen = [{
-                addr = "${cfg.network.ip}";
-                port = 8010;
-              }];
-            };
-
-            virtualHosts.prometheus = {
-              locations."/".proxyPass = "http://prometheus";
-              listen = [{
-                addr = "${cfg.network.ip}";
-                port = 8020;
-              }];
-            };
-
-            # confirm with http://192.168.1.50:8030/loki/api/v1/status/buildinfo
-            #     (or)     /config /metrics /ready
-            virtualHosts.loki = {
-              locations."/".proxyPass = "http://loki";
-              listen = [{
-                addr = "${cfg.network.ip}";
-                port = 8030;
-              }];
-            };
-
-            virtualHosts.promtail = {
-              locations."/".proxyPass = "http://promtail";
-              listen = [{
-                addr = "${cfg.network.ip}";
-                port = 8031;
-              }];
             };
           };
 
