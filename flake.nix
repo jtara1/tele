@@ -13,6 +13,21 @@
       let
       in {
         options.services.logs-app = {
+          mdDoc = ''
+            This module provides a configuration for the Logs App service, which is responsible for collecting and managing logs from various sources.
+
+            The Logs App service includes components for log ingestion, storage, and visualization. It integrates with tools like Loki for log storage and Grafana for log visualization.
+
+            By enabling this module, you enable several services which include:
+              - grafana http://localhost:3010
+              - prometheus http://localhost:3020
+              - loki http://localhost:3030
+              - promtail http://localhost:3031
+
+            Promtail will ingest logs from:
+              - docker (rootless) containers
+          '';
+
           enable = lib.mkOption {
             type = types.bool;
             default = true;
@@ -25,11 +40,6 @@
         let cfg = config.services.logs-app;
         in lib.mkIf cfg.enable {
           # source: (forked) https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e
-          # services:
-          #   - grafana http://localhost:3010
-          #   - prometheus http://localhost:3020
-          #   - loki http://localhost:3030
-          #   - promtail http://localhost:3031
 
           # prometheus: port 3020
           #
