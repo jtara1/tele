@@ -23,6 +23,7 @@
 
             Promtail will ingest logs from:
               - docker (rootless) containers
+              - nginx access logs
           '';
 
           enable = lib.mkOption {
@@ -154,33 +155,30 @@
                     }
                   ];
                 }
-                # docker (rootless) container logs - tested with docker log-driver = "json-file"
+                # journal logs which includes docker (rootless) container logs
                 {
-                  job_name = "docker";
-                  docker_sd_configs = [{ # options: https://grafana.com/docs/loki/latest/send-data/promtail/configuration/#docker_sd_configs
-                    host = "http://127.0.0.1";
-                    port = 2375;
-                    refresh_interval = "5s";
-                  }];
+                  job_name = "journal";
+                  journal = {
+                    max_age = "12h";
+                    labels = { job = "journal"; };
+                  };
                   relabel_configs = [
                     {
-                      source_labels = [ "__meta_docker_container_name" ];
-                      target_label = "container";
-                      regex = "/(.+)"; # renames /my_container to my_container
-                      replacement = "$1";
+                      source_labels = [ "__journal__systemd_unit" ];
+                      target_label = "unit";
                     }
                     {
-                      source_labels = [ "__meta_docker_container_log_stream" ];
-                      target_label = "logstream";
+                      source_labels = [ "__journal__hostname" ];
+                      target_label = "hostname";
                     }
                     {
-                      source_labels = [ "__meta_docker_container_image" ];
-                      target_label = "image";
+                      source_labels = [ "__journal_syslog_identifier" ];
+                      target_label = "syslog_identifier";
                     }
                   ];
                   pipeline_stages = [{
                     docker = { stop_grace_period = "1m"; };
-                  }]; # continue to read logs after container exits
+                  }];
                 }
               ];
             };
@@ -256,14 +254,10 @@
           };
 
           virtualisation.docker.rootless.daemon.settings = {
-            hosts = [
-              "unix://"
-              "tcp://127.0.0.1:2375"
-            ];
-            "log-driver" = "json-file"; # for compatibility with promtail scrape_config, use json-file or journald
-            "log-opts" = {
-              "max-size" = "10m";
-              "max-file" = "3";
+            log-driver = "journald"; # needs to be compatible with promtail scrape_config job
+            log-opts = {
+              tag = "{{.Name}}";
+              labels = "time,level,msg";
             };
           };
         };
