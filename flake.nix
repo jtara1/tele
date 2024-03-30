@@ -157,8 +157,9 @@
                 # docker (rootless) container logs - tested with docker log-driver = "json-file"
                 {
                   job_name = "docker";
-                  docker_sd_configs = [{
-                    host = "unix:///run/user/1000/docker.sock";
+                  docker_sd_configs = [{ # options: https://grafana.com/docs/loki/latest/send-data/promtail/configuration/#docker_sd_configs
+                    host = "http://127.0.0.1";
+                    port = 2375;
                     refresh_interval = "5s";
                   }];
                   relabel_configs = [
@@ -255,7 +256,11 @@
           };
 
           virtualisation.docker.rootless.daemon.settings = {
-            "log-driver" = "json-file"; # tested for compatibility with promtail scrape_config
+            hosts = [
+              "unix://"
+              "tcp://127.0.0.1:2375"
+            ];
+            "log-driver" = "json-file"; # for compatibility with promtail scrape_config, use json-file or journald
             "log-opts" = {
               "max-size" = "10m";
               "max-file" = "3";
