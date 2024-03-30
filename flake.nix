@@ -155,14 +155,16 @@
                     }
                   ];
                 }
-                # journal logs which includes docker (rootless) container logs
+                # journal logs which includes docker container logs
                 {
                   job_name = "journal";
                   journal = {
                     max_age = "12h";
-                    labels = { job = "journal"; };
+                    labels = {
+                      job = "journal";
+                    };
                   };
-                  relabel_configs = [
+                  relabel_configs = [ # explore journal log meta: $ journalctl CONTAINER_NAME=zealous_agnesi -o json
                     {
                       source_labels = [ "__journal__systemd_unit" ];
                       target_label = "unit";
@@ -173,7 +175,15 @@
                     }
                     {
                       source_labels = [ "__journal_syslog_identifier" ];
-                      target_label = "syslog_identifier";
+                      target_label = "syslog_id";
+                    }
+                    {
+                      source_labels = [ "__journal_container_name" ];
+                      target_label = "container";
+                    }
+                    {
+                      source_labels = [ "__journal_image_name" ];
+                      target_label = "image";
                     }
                   ];
                   pipeline_stages = [{
@@ -254,10 +264,10 @@
           };
 
           virtualisation.docker.rootless.daemon.settings = {
-            log-driver = "journald"; # needs to be compatible with promtail scrape_config job
+            log-driver = "journald";     # needs to be compatible with promtail scrape_config job
             log-opts = {
-              tag = "{{.Name}}";
-              labels = "time,level,msg";
+              tag = "{{.Name}}";         # main tag is container name, not default container id
+              labels = "time,level,msg"; # default properties from node.js pino logger
             };
           };
         };
