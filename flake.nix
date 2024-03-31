@@ -164,7 +164,7 @@
                       job = "journal";
                     };
                   };
-                  relabel_configs = [ # explore journal log meta: $ journalctl CONTAINER_NAME=zealous_agnesi -o json
+                  relabel_configs = [ # explore journal log meta: $ journalctl CONTAINER_NAME=zealous_agnesi -o json --reverse --no-pager | head | jq
                     {
                       source_labels = [ "__journal__systemd_unit" ];
                       target_label = "unit";
@@ -182,18 +182,37 @@
                       target_label = "container";
                     }
                     {
+                      source_labels = [ "__journal_container_id" ];
+                      target_label = "container_id";
+                    }
+                    {
                       source_labels = [ "__journal_image_name" ];
                       target_label = "image";
                     }
                   ];
-                  pipeline_stages = [{
-                    docker = { stop_grace_period = "1m"; };
-                  }];
+                  pipeline_stages = [
+                    { docker = { stop_grace_period = "1m"; }; } # unwrap docker-wrapped container logs
+                    { # logs directly from container in docker journald MESSAGE meta
+                      json = {
+                        expressions = {
+                          level = "level";
+                        };
+                      };
+                    }
+                    { # parsed from json pipeline stage
+                      labels = { # some of the default labels from node.js pino logger,
+                        level = "level";
+                      };
+                    }
+                  ];
                 }
               ];
             };
             # extraFlags
           };
+
+          # for file permissions to access the log file
+          users.users.promtail.extraGroups = [ "nginx" ];
 
           # grafana: port 3010
           #
