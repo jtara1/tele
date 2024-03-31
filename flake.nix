@@ -198,11 +198,13 @@
           # grafana: port 3010
           #
           services.grafana = {
-            port = 3010;
-            protocol = "http";
-            addr = "127.0.0.1";
-            analytics.reporting.enable = false;
             enable = true;
+            settings = {
+              port = 3010;
+              protocol = "http";
+              addr = "127.0.0.1";
+              analytics.reporting.enable = false;
+            };
             provision = {
               enable = true;
               datasources.settings = {
