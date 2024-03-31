@@ -200,10 +200,10 @@
           services.grafana = {
             enable = true;
             settings = {
-              port = 3010;
+              http_port = 3010;
+              http_addr = "127.0.0.1";
               protocol = "http";
-              addr = "127.0.0.1";
-              analytics.reporting.enable = false;
+              analytics.reporting_enabled = false;
             };
             provision = {
               enable = true;
