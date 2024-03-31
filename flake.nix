@@ -289,7 +289,7 @@
           virtualisation.docker.rootless.daemon.settings = {
             log-driver = "journald";     # needs to be compatible with promtail scrape_config job
             log-opts = {
-              tag = "{{.Name}}";         # main tag is container name, not default container id
+              tag = "{{.Name}}";         # set tag to container name, don't default to container id
               labels = "time,level,msg"; # default properties from node.js pino logger
             };
           };
