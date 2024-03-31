@@ -89,13 +89,13 @@
 
               schema_config = {
                 configs = [{
-                  from = "2020-10-24";
+                  from = "2020-01-01";
                   store = "tsdb";
                   object_store = "filesystem";
                   schema = "v12";
                   index = {
                     prefix = "index_";
-                    period = "24h";
+                    period = "720h"; # 30 days
                   };
                 }];
               };
