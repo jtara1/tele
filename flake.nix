@@ -87,11 +87,6 @@
                 ring = { kvstore = { store = "inmemory"; }; };
               };
 
-#              limits_config = {
-#                max_query_lookback = "7d";
-#                max_query_length = "30d";
-#              };
-
               schema_config = {
                 configs = [{
                   from = "2020-01-01";
@@ -124,17 +119,19 @@
 
               positions = { filename = "/tmp/positions.yaml"; };
 
-              clients = [{ url = "http://127.0.0.1:${
-                toString
-                config.services.loki.configuration.server.http_listen_port
-              }/loki/api/v1/push"; }];
+              clients = [{
+                url = "http://127.0.0.1:${
+                    toString
+                    config.services.loki.configuration.server.http_listen_port
+                  }/loki/api/v1/push";
+              }];
 
               scrape_configs = [
                 # nginx access logs
                 {
                   job_name = "nginx";
                   static_configs = [{
-                    targets = ["localhost"];
+                    targets = [ "localhost" ];
                     labels = {
                       job = "nginx";
                       __path__ = "/var/log/nginx/access.log";
@@ -143,7 +140,8 @@
                   pipeline_stages = [
                     {
                       regex = {
-                        expression = ''(?P<remote_addr>[\w\.:\[\]]+) - (?P<remote_user>[^ ]*) \[(?P<time_local>[^\]]+)\] "(?P<request>[^"]*)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"'';
+                        expression = ''
+                          (?P<remote_addr>[\w\.:\[\]]+) - (?P<remote_user>[^ ]*) \[(?P<time_local>[^\]]+)\] "(?P<request>[^"]*)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"'';
                       };
                     }
                     {
@@ -165,11 +163,10 @@
                   job_name = "journal";
                   journal = {
                     max_age = "12h";
-                    labels = {
-                      job = "journal";
-                    };
+                    labels = { job = "journal"; };
                   };
-                  relabel_configs = [ # explore journal log meta: $ journalctl CONTAINER_NAME=zealous_agnesi -o json --reverse --no-pager | head | jq
+                  # explore journal log meta: $ journalctl CONTAINER_NAME=zealous_agnesi -o json --reverse --no-pager | head | jq
+                  relabel_configs = [
                     {
                       source_labels = [ "__journal__systemd_unit" ];
                       target_label = "unit";
@@ -189,18 +186,15 @@
                   ];
                   pipeline_stages = [
                     # unwraps docker-wrapped container logs
-                    { docker = { stop_grace_period = "1m"; }; } # process remaining logs after container exits
+                    {
+                      docker = { stop_grace_period = "1m"; };
+                    } # processes remaining logs after container exits
                     { # logs directly from container in docker journald MESSAGE meta
-                      json = {
-                        expressions = {
-                          level = "level";
-                        };
-                      };
+                      json = { expressions = { level = "level"; }; };
                     }
                     { # parsed from json pipeline stage
-                      labels = { # some of the default labels from node.js pino logger,
-                        level = "level";
-                      };
+                      # some of the default labels from node.js pino logger,
+                      labels = { level = "level"; };
                     }
                   ]; # other container logs can still be queried by property at query-time
                 }
@@ -285,10 +279,13 @@
           };
 
           virtualisation.docker.rootless.daemon.settings = {
-            log-driver = "journald";     # needs to be compatible with promtail scrape_config job
+            # needs to be compatible with promtail scrape_config job
+            log-driver = "journald";
             log-opts = {
-              tag = "{{.Name}}";         # set tag to container name, don't default to container id
-              labels = "time,level,msg"; # default properties from node.js pino logger
+              # set tag to container name, don't default to container id
+              tag = "{{.Name}}";
+              # default properties from node.js pino logger
+              labels = "time,level,msg";
             };
           };
         };
