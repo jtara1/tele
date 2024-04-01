@@ -249,9 +249,11 @@
           #
           services.nginx = {
             upstreams = {
+              # example usage in context of nginx config: "http://grafana"
+              # services.nginx.virtualHosts."logs.example.com".locations."/".proxyPass = "http://grafana";
               "grafana" = {
                 servers = {
-                  "127.0.0.1:${toString config.services.grafana.port}" = { };
+                  "127.0.0.1:${toString config.services.grafana.settings.server.http_port}" = { };
                 };
               };
               "prometheus" = {
