@@ -186,10 +186,6 @@
                       source_labels = [ "__journal_container_name" ];
                       target_label = "container";
                     }
-                    {
-                      source_labels = [ "__journal_container_id" ];
-                      target_label = "container_id";
-                    }
                   ];
                   pipeline_stages = [
                     # unwraps docker-wrapped container logs
