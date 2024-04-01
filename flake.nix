@@ -147,15 +147,15 @@
                       };
                     }
                     {
-                      labels = {
-                        remote_addr = "remote_addr";
-                        remote_user = "remote_user";
-                        time_local = "time_local";
-                        request = "request";
-                        status = "status";
-                        body_bytes_sent = "body_bytes_sent";
-                        http_referer = "http_referer";
-                        http_user_agent = "http_user_agent";
+                      labels = { # consider removing unused labels
+                        gate_remote_addr = "remote_addr";
+                        gate_remote_user = "remote_user";
+                        gate_time_local = "time_local";
+                        gate_request = "request";
+                        gate_status = "status";
+                        gate_body_bytes_sent = "body_bytes_sent";
+                        gate_http_referer = "http_referer";
+                        gate_http_user_agent = "http_user_agent";
                       };
                     }
                   ];
@@ -190,13 +190,10 @@
                       source_labels = [ "__journal_container_id" ];
                       target_label = "container_id";
                     }
-                    {
-                      source_labels = [ "__journal_image_name" ];
-                      target_label = "image";
-                    }
                   ];
                   pipeline_stages = [
-                    { docker = { stop_grace_period = "1m"; }; } # unwrap docker-wrapped container logs
+                    # unwraps docker-wrapped container logs
+                    { docker = { stop_grace_period = "1m"; }; } # process remaining logs after container exits
                     { # logs directly from container in docker journald MESSAGE meta
                       json = {
                         expressions = {
@@ -209,7 +206,7 @@
                         level = "level";
                       };
                     }
-                  ];
+                  ]; # other container logs can still be queried by property at query-time
                 }
               ];
             };
