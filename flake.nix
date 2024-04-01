@@ -143,19 +143,19 @@
                   pipeline_stages = [
                     {
                       regex = {
-                        expression = ''(?P<remote_addr>[\w\.]+) - (?P<remote_user>[^ ]*) \[(?P<time_local>.*)\] "(?P<request>[^"]*)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"'';
+                        expression = ''(?P<remote_addr>[\w\.:\[\]]+) - (?P<remote_user>[^ ]*) \[(?P<time_local>[^\]]+)\] "(?P<request>[^"]*)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"'';
                       };
                     }
                     {
                       labels = {
-                        remote_addr = ''$.remote_addr'';
-                        remote_user = ''$.remote_user'';
-                        time_local = ''$.time_local'';
-                        request = ''$.request'';
-                        status = ''$.status'';
-                        body_bytes_sent = ''$.body_bytes_sent'';
-                        http_referer = ''$.http_referer'';
-                        http_user_agent = ''$.http_user_agent'';
+                        remote_addr = "remote_addr";
+                        remote_user = "remote_user";
+                        time_local = "time_local";
+                        request = "request";
+                        status = "status";
+                        body_bytes_sent = "body_bytes_sent";
+                        http_referer = "http_referer";
+                        http_user_agent = "http_user_agent";
                       };
                     }
                   ];
