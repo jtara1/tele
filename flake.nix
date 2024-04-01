@@ -87,6 +87,11 @@
                 ring = { kvstore = { store = "inmemory"; }; };
               };
 
+#              limits_config = {
+#                max_query_lookback = "7d";
+#                max_query_length = "30d";
+#              };
+
               schema_config = {
                 configs = [{
                   from = "2020-01-01";
@@ -95,7 +100,7 @@
                   schema = "v12";
                   index = {
                     prefix = "index_";
-                    period = "720h"; # 30 days
+                    period = "24h";
                   };
                 }];
               };
