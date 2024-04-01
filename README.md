@@ -1,11 +1,14 @@
 # logs-app
 
-automatically ingest logs from (rootless) docker and nginx access logs with dashboard configured
+automatically ingest logs from (rootless) docker and nginx access logs with dashboard configured to query and visualize
+
+
+## Requirements
+
+NixOS and Nix Flakes on local host for dev and remote host for usage. 
 
 
 ## Setup
-
-local-first development
 
 assumptions for simplification:
 - docker containers run on same host
@@ -32,10 +35,9 @@ where `inputs` is the 1st parameter in the function assigned to `outputs`.
 On host OS and its network, you should expose or redirect to its `localhost:3010`, 
 grafana, the dashboard for querying and graphs
 
-
 ### Security
 
-Add security. Change grafana dashboard password. Allowlist your IP from which you're accessing it. etc
+Add security. Change grafana dashboard password. Allowlist your IP from which you're accessing it. TLS. etc
 
 
 ## Usage
@@ -48,7 +50,8 @@ username: admin
 password: admin
 ```
 
-The configuration adds a data source for Loki in Grafana. Just click Explore, select Loki, and start querying your logs.
+The configuration adds data sources for Loki & Prometheus in Grafana. 
+Just click Explore, select one, and start querying your logs. Or, add visualizations under Dashboards.
 
 
 ## TODO
