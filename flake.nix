@@ -148,14 +148,14 @@
                     }
                     {
                       labels = { # consider removing unused labels
-                        gate_remote_addr = "remote_addr";
-                        gate_remote_user = "remote_user";
-                        gate_time_local = "time_local";
-                        gate_request = "request";
-                        gate_status = "status";
-                        gate_body_bytes_sent = "body_bytes_sent";
-                        gate_http_referer = "http_referer";
-                        gate_http_user_agent = "http_user_agent";
+                        z_gate_remote_addr = "remote_addr";
+                        z_gate_remote_user = "remote_user";
+                        z_gate_time_local = "time_local";
+                        z_gate_request = "request";
+                        z_gate_status = "status";
+                        z_gate_body_bytes_sent = "body_bytes_sent";
+                        z_gate_http_referer = "http_referer";
+                        z_gate_http_user_agent = "http_user_agent";
                       };
                     }
                   ];
