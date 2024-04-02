@@ -254,6 +254,7 @@
                           name = relativePath;
                           src = pkgsUnstable.fetchgit {
                             url = "https://github.com/rfmoz/grafana-dashboards";
+                            rev = "5fcf5a2cd30dd7cdb9886d386e6ac3fe1c418864";
                             sparseCheckout = [ relativePath ];
                             hash = "sha256-F+2cZdMQBQd1zj0Cyh7+IvfIRwcdABlmnis5pvnVkPw=";
                           };
@@ -262,7 +263,7 @@
                             cp ${relativePath} $out
                           '';
                         };
-                      in "${nodeExporterFullDrv}";
+                      in nodeExporterFullDrv;
                   };
                 }];
               };
