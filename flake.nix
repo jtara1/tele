@@ -47,7 +47,7 @@
             exporters = {
               node = {
                 port = 3021;
-                enabledCollectors = [ "systemd" ];
+                enabledCollectors = [ "systemd" "processes" ];
                 enable = true;
               };
             };
@@ -240,6 +240,16 @@
                       }";
                   }
                 ];
+              };
+              dashboards.settings = {
+                apiVersion = 1;
+                providers = [{
+                  name = "default";
+                  type = "file";
+                  options = {
+                    path = ./grafana-dashboard-node-exporter-full.json;
+                  };
+                }];
               };
             };
           };
