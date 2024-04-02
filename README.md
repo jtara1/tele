@@ -50,8 +50,10 @@ username: admin
 password: admin
 ```
 
-The configuration adds data sources for Loki & Prometheus in Grafana. 
-Just click Explore, select one, and start querying your logs. Or, add visualizations under Dashboards.
+You can query logs, create visualizations, load a dashboard. Checkout:
+- Explore
+- Dashboards
+- The pre-configured dashboard for core resource metrics - http://localhost:3010/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m
 
 
 ## TODO
@@ -69,6 +71,7 @@ Just click Explore, select one, and start querying your logs. Or, add visualizat
 - [ ] ingest logs from multiple virtual machines in dedicated logs-app server?
 - [x] fix and test the nginx config for local dev and for my server
 - [ ] refactor into nix module(s) to be more portable for non-flake NixOS users
+- [x] pre-configured visualization for core resources
 
 
 ## References
