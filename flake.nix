@@ -247,7 +247,22 @@
                   name = "default";
                   type = "file";
                   options = {
-                    path = ./grafana-dashboard-node-exporter-full.json;
+                    path =
+                      let
+                        relativePath = "prometheus/node-exporter-full.json";
+                        nodeExporterFullDrv = pkgsUnstable.stdenv.mkDerivation {
+                          name = relativePath;
+                          src = pkgsUnstable.fetchgit {
+                            url = "https://github.com/rfmoz/grafana-dashboards";
+                            sparseCheckout = [ relativePath ];
+                            hash = "sha256-F+2cZdMQBQd1zj0Cyh7+IvfIRwcdABlmnis5pvnVkPw=";
+                          };
+                          installPhase = ''
+                            mkdir -p $out
+                            cp ${relativePath} $out
+                          '';
+                        };
+                      in "${nodeExporterFullDrv}";
                   };
                 }];
               };
