@@ -63,6 +63,12 @@
                 ];
               }];
             }];
+
+#            alertmanager = {
+#              enable = true;
+#              configuration = { }; # xor
+#              configText = '''';
+#            };
           };
 
           # loki: port 3030
@@ -267,6 +273,8 @@
                   };
                 }];
               };
+#              alerting = {
+#              };
             };
           };
 
