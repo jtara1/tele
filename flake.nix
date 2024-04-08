@@ -35,17 +35,17 @@
 
           email = {
             host = mkOption {
-              type = types.string;
+              type = types.str;
               example = "mail.example.com:587";
             };
 
             senderAddress = mkOption {
-              type = types.string;
+              type = types.str;
               example = "alerts@example.com";
             };
 
             receiverAddress = mkOption {
-              type = types.string;
+              type = types.str;
               example = "postmaster@example.com";
             };
 
@@ -306,8 +306,6 @@
                   };
                 }];
               };
-#              alerting = {
-#              };
             };
           };
 
