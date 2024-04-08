@@ -323,6 +323,72 @@
                     }];
                   }];
                 };
+
+                rules.path = pkgsUnstable.writeText "grafana-alerting-rules.yaml" ''
+                  apiVersion: 1
+                  groups:
+                    - orgId: 1
+                      name: Core Health
+                      folder: Node Exporter Alerts
+                      interval: 5m
+                      rules:
+                        - uid: c0a5f1fe-3435-4c07-abfd-870043d2a654
+                          title: memory
+                          condition: A
+                          data:
+                            - refId: A
+                              relativeTimeRange:
+                                from: 600
+                                to: 0
+                              datasourceUid: PBFA97CFB590B2093
+                              model:
+                                datasource:
+                                    type: prometheus
+                                    uid: PBFA97CFB590B2093
+                                editorMode: code
+                                expr: 100 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100)
+                                hide: false
+                                instant: true
+                                intervalMs: 1000
+                                legendFormat: __auto
+                                maxDataPoints: 43200
+                                range: false
+                                refId: A
+                            - refId: B
+                              relativeTimeRange:
+                                from: 600
+                                to: 0
+                              datasourceUid: __expr__
+                              model:
+                                conditions:
+                                  - evaluator:
+                                      params:
+                                        - 90
+                                        - 0
+                                      type: gt
+                                    operator:
+                                      type: and
+                                    query:
+                                      params: []
+                                    reducer:
+                                      params: []
+                                      type: avg
+                                    type: query
+                                datasource:
+                                  name: Expression
+                                  type: __expr__
+                                  uid: __expr__
+                                expression: A
+                                hide: false
+                                intervalMs: 1000
+                                maxDataPoints: 43200
+                                refId: B
+                                type: threshold
+                          noDataState: NoData
+                          execErrState: Error
+                          for: 5m
+                          isPaused: false
+                '';
               };
             };
           };
