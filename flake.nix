@@ -51,7 +51,7 @@
 
             secretsFilePath = mkOption {
               type = types.path;
-              example = /etc/logs-app/secrets.json;
+              example = ./secrets/logs-app.json;
               description = ''
                 Copy and reference secrets.json.example which contains:
                 {
