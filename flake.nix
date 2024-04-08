@@ -392,6 +392,67 @@
                             execErrState: Error
                             for: 5m
                             isPaused: false
+
+                          - uid: f4b91d58-7bc1-458a-8c64-4d03b6ab20b0
+                            title: storage
+                            condition: B
+                            data:
+                              - refId: avail_disk_percent
+                                relativeTimeRange:
+                                  from: 600
+                                  to: 0
+                                datasourceUid: PBFA97CFB590B2093
+                                model:
+                                  datasource:
+                                      type: prometheus
+                                      uid: PBFA97CFB590B2093
+                                  editorMode: code
+                                  expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/"} * 100) / node_filesystem_size_bytes{mountpoint="/"})
+                                  instant: true
+                                  intervalMs: 1000
+                                  legendFormat: __auto
+                                  maxDataPoints: 43200
+                                  range: false
+                                  refId: avail_disk_percent
+                              - refId: B
+                                relativeTimeRange:
+                                  from: 600
+                                  to: 0
+                                datasourceUid: __expr__
+                                model:
+                                  conditions:
+                                      - evaluator:
+                                          params:
+                                              - 90
+                                              - 0
+                                          type: gt
+                                        operator:
+                                          type: and
+                                        query:
+                                          params: []
+                                        reducer:
+                                          params: []
+                                          type: avg
+                                        type: query
+                                  datasource:
+                                      name: Expression
+                                      type: __expr__
+                                      uid: __expr__
+                                  expression: avail_disk_percent
+                                  intervalMs: 1000
+                                  maxDataPoints: 43200
+                                  refId: B
+                                  type: threshold
+                            noDataState: NoData
+                            execErrState: Error
+                            for: 5m
+                            annotations:
+                              description: ""
+                              runbook_url: ""
+                              summary: ""
+                            labels:
+                              "": ""
+                            isPaused: false
                   '';
 
                 policies.settings = {
