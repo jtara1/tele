@@ -26,8 +26,8 @@
               - nginx access logs
           '';
 
-          enable = lib.mkOption {
-            type = lib.types.bool;
+          enable = mkOption {
+            type = types.bool;
             default = true;
             example = false;
             description = "Enable the Logs App";
@@ -287,11 +287,11 @@
                   type = "file";
                   options = {
                     path =
-                      let
+                      with pkgsUnstable; let
                         relativePath = "prometheus/node-exporter-full.json";
-                        nodeExporterFullDrv = pkgsUnstable.stdenv.mkDerivation {
+                        nodeExporterFullDrv = stdenv.mkDerivation {
                           name = relativePath;
-                          src = pkgsUnstable.fetchgit {
+                          src = fetchgit {
                             url = "https://github.com/rfmoz/grafana-dashboards";
                             rev = "5fcf5a2cd30dd7cdb9886d386e6ac3fe1c418864";
                             sparseCheckout = [ relativePath ];
