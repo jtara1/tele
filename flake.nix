@@ -9,7 +9,7 @@
       pkgsUnstable = import nixpkgs { inherit system; };
     in {
       nixosModules.default = { config, lib, ... }: {
-        options.services.logs-app = {
+        options.services.logs-app = with lib; {
           mdDoc = ''
             This module provides a configuration for the Logs App service, which is responsible for collecting and managing logs from various sources.
 
@@ -31,6 +31,34 @@
             default = true;
             example = false;
             description = "Enable the Logs App";
+          };
+
+          email = {
+            host = mkOption {
+              type = types.string;
+              example = "mail.example.com:587";
+            };
+
+            senderAddress = mkOption {
+              type = types.string;
+              example = "alerts@example.com";
+            };
+
+            receiverAddress = mkOption {
+              type = types.string;
+              example = "postmaster@example.com";
+            };
+
+            secretsFilePath = mkOption {
+              type = types.path;
+              example = /etc/logs-app/secrets.json;
+              description = ''
+                Copy and reference secrets.json.example which contains:
+                {
+                  "emailPlaintextPassword": "your-email-password"
+                }
+              '';
+            };
           };
         };
 
@@ -63,12 +91,6 @@
                 ];
               }];
             }];
-
-#            alertmanager = {
-#              enable = true;
-#              configuration = { }; # xor
-#              configText = '''';
-#            };
           };
 
           # loki: port 3030
@@ -223,6 +245,17 @@
                 protocol = "http";
               };
               analytics.reporting_enabled = false;
+              smtp =
+                let
+                  secrets = builtins.fromJSON (builtins.readFile cfg.email.secretsFilePath);
+                in rec {
+                  enabled = true;
+                  host = cfg.email.host;
+                  user = cfg.email.senderAddress;
+                  password = secrets.emailPlaintextPassword;
+                  from_address = user;
+                  from_name = "Metrics";
+              };
             };
             provision = {
               enable = true;
