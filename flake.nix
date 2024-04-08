@@ -389,6 +389,18 @@
                           for: 5m
                           isPaused: false
                 '';
+
+                policies.settings = {
+                  apiVersion = 1;
+                  policies = [{
+                    orgId = 1;
+                    receiver = "alert-receivers";
+                    group_by = [ "grafana_folder" "alertname" ];
+                    group_wait = "30s";
+                    group_interval = "5m";
+                    repeat_interval = "4h";
+                  }];
+                };
               };
             };
           };
