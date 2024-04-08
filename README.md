@@ -67,11 +67,13 @@ You can query logs, create visualizations, load a dashboard. Checkout:
 - [x] improve promtail job, docker
 - [x] re-add nginx access logs pipeline
 - [x] prometheus for system monitoring and metrics
-- [ ] alerts for core resources: cpu, storage, memory
+- [x] 1st alerts rule for memory
+- [x] alert notifications via SMTPS/email
+- [ ] alert rules for core resources: cpu, storage, memory
 - [ ] ingest logs from multiple virtual machines in dedicated logs-app server?
 - [x] fix and test the nginx config for local dev and for my server
 - [ ] refactor into nix module(s) to be more portable for non-flake NixOS users
-- [x] pre-configured visualization for core resources
+- [x] core health dashboard - pre-configured visualization for core resources
 
 
 ## References
