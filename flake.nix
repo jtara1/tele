@@ -306,6 +306,24 @@
                   };
                 }];
               };
+              alerting = {
+                contactPoints.settings = {
+                  apiVersion = 1;
+                  contactPoints = [{
+                    orgId = 1;
+                    name = "alert-receivers";
+                    receivers = [{
+                      uid = "f637483e-f542-11ee-8a7e-dbe95d4fb174";
+                      type = "email";
+                      settings = {
+                        addresses = cfg.email.receiverAddress;
+                        singleEmail = false;
+                      };
+                      disableResolveMessage = false;
+                    }];
+                  }];
+                };
+              };
             };
           };
 
