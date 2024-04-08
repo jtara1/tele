@@ -245,16 +245,16 @@
                 protocol = "http";
               };
               analytics.reporting_enabled = false;
-              smtp =
-                let
-                  secrets = builtins.fromJSON (builtins.readFile cfg.email.secretsFilePath);
-                in rec {
-                  enabled = true;
-                  host = cfg.email.host;
-                  user = cfg.email.senderAddress;
-                  password = secrets.emailPlaintextPassword;
-                  from_address = user;
-                  from_name = "Metrics";
+              smtp = let
+                secrets = builtins.fromJSON
+                  (builtins.readFile cfg.email.secretsFilePath);
+              in rec {
+                enabled = true;
+                host = cfg.email.host;
+                user = cfg.email.senderAddress;
+                password = secrets.emailPlaintextPassword;
+                from_address = user;
+                from_name = "Metrics";
               };
             };
             provision = {
@@ -286,8 +286,8 @@
                   name = "default";
                   type = "file";
                   options = {
-                    path =
-                      with pkgsUnstable; let
+                    path = with pkgsUnstable;
+                      let
                         relativePath = "prometheus/node-exporter-full.json";
                         nodeExporterFullDrv = stdenv.mkDerivation {
                           name = relativePath;
@@ -295,7 +295,8 @@
                             url = "https://github.com/rfmoz/grafana-dashboards";
                             rev = "5fcf5a2cd30dd7cdb9886d386e6ac3fe1c418864";
                             sparseCheckout = [ relativePath ];
-                            hash = "sha256-F+2cZdMQBQd1zj0Cyh7+IvfIRwcdABlmnis5pvnVkPw=";
+                            hash =
+                              "sha256-F+2cZdMQBQd1zj0Cyh7+IvfIRwcdABlmnis5pvnVkPw=";
                           };
                           installPhase = ''
                             mkdir -p $out
@@ -324,71 +325,72 @@
                   }];
                 };
 
-                rules.path = pkgsUnstable.writeText "grafana-alerting-rules.yaml" ''
-                  apiVersion: 1
-                  groups:
-                    - orgId: 1
-                      name: Core Health
-                      folder: Node Exporter Alerts
-                      interval: 5m
-                      rules:
-                        - uid: c0a5f1fe-3435-4c07-abfd-870043d2a654
-                          title: memory
-                          condition: A
-                          data:
-                            - refId: A
-                              relativeTimeRange:
-                                from: 600
-                                to: 0
-                              datasourceUid: PBFA97CFB590B2093
-                              model:
-                                datasource:
-                                    type: prometheus
-                                    uid: PBFA97CFB590B2093
-                                editorMode: code
-                                expr: 100 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100)
-                                hide: false
-                                instant: true
-                                intervalMs: 1000
-                                legendFormat: __auto
-                                maxDataPoints: 43200
-                                range: false
-                                refId: A
-                            - refId: B
-                              relativeTimeRange:
-                                from: 600
-                                to: 0
-                              datasourceUid: __expr__
-                              model:
-                                conditions:
-                                  - evaluator:
-                                      params:
-                                        - 90
-                                        - 0
-                                      type: gt
-                                    operator:
-                                      type: and
-                                    query:
-                                      params: []
-                                    reducer:
-                                      params: []
-                                      type: avg
-                                    type: query
-                                datasource:
-                                  name: Expression
-                                  type: __expr__
-                                  uid: __expr__
-                                expression: A
-                                hide: false
-                                intervalMs: 1000
-                                maxDataPoints: 43200
-                                refId: B
-                                type: threshold
-                          noDataState: NoData
-                          execErrState: Error
-                          for: 5m
-                          isPaused: false
-                '';
+                rules.path =
+                  pkgsUnstable.writeText "grafana-alerting-rules.yaml" ''
+                    apiVersion: 1
+                    groups:
+                      - orgId: 1
+                        name: Core Health
+                        folder: Node Exporter Alerts
+                        interval: 5m
+                        rules:
+                          - uid: c0a5f1fe-3435-4c07-abfd-870043d2a654
+                            title: memory
+                            condition: A
+                            data:
+                              - refId: A
+                                relativeTimeRange:
+                                  from: 600
+                                  to: 0
+                                datasourceUid: PBFA97CFB590B2093
+                                model:
+                                  datasource:
+                                      type: prometheus
+                                      uid: PBFA97CFB590B2093
+                                  editorMode: code
+                                  expr: 100 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100)
+                                  hide: false
+                                  instant: true
+                                  intervalMs: 1000
+                                  legendFormat: __auto
+                                  maxDataPoints: 43200
+                                  range: false
+                                  refId: A
+                              - refId: B
+                                relativeTimeRange:
+                                  from: 600
+                                  to: 0
+                                datasourceUid: __expr__
+                                model:
+                                  conditions:
+                                    - evaluator:
+                                        params:
+                                          - 90
+                                          - 0
+                                        type: gt
+                                      operator:
+                                        type: and
+                                      query:
+                                        params: []
+                                      reducer:
+                                        params: []
+                                        type: avg
+                                      type: query
+                                  datasource:
+                                    name: Expression
+                                    type: __expr__
+                                    uid: __expr__
+                                  expression: A
+                                  hide: false
+                                  intervalMs: 1000
+                                  maxDataPoints: 43200
+                                  refId: B
+                                  type: threshold
+                            noDataState: NoData
+                            execErrState: Error
+                            for: 5m
+                            isPaused: false
+                  '';
 
                 policies.settings = {
                   apiVersion = 1;
@@ -414,7 +416,9 @@
               # services.nginx.virtualHosts."logs.example.com".locations."/".proxyPass = "http://grafana";
               "grafana" = {
                 servers = {
-                  "127.0.0.1:${toString config.services.grafana.settings.server.http_port}" = { };
+                  "127.0.0.1:${
+                    toString config.services.grafana.settings.server.http_port
+                  }" = { };
                 };
               };
               "prometheus" = {
