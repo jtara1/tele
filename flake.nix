@@ -28,7 +28,7 @@
 
           enable = mkOption {
             type = types.bool;
-            default = true;
+            default = false;
             example = false;
             description = "Enable the Logs App";
           };
