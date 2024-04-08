@@ -19,6 +19,8 @@ promtail should safely fail for its respective scrape job if you're not running 
 
 ### NixOS Flake
 
+#### Import
+
 in your system `flake.nix` `inputs`, add
 ```text
     logs-app.url = "github:jtara1/logs-app";
@@ -29,6 +31,30 @@ in your `modules` or an `imports`, append
     inputs.logs-app.nixosModules.default
 ```
 where `inputs` is the 1st parameter in the function assigned to `outputs`.
+
+#### Configure
+
+in a nix module, enable it with config such as
+```text
+  services.logs-app = {
+    enable = true;
+    email = {
+      host = "mail.example.com:587";
+      senderAddress = "admin@example.com";
+      receiverAddress = "admin@example.com";
+      secretsFilePath = /etc/logs-app/secrets.json;
+    };
+  };
+```
+
+`email` is optional and used for sending emails for notifications based on alert rules.
+
+`secretsFilePath` should be a file path to a file containing:
+```json
+{
+  "emailPlaintextPassword": "your-email-password"
+}
+```
 
 ### Publish
 
@@ -53,7 +79,7 @@ password: admin
 You can query logs, create visualizations, load a dashboard. Checkout:
 - Explore
 - Dashboards
-- The pre-configured dashboard for core resource metrics - http://localhost:3010/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m
+  - Node Exporter Full http://localhost:3010/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m
 
 
 ## TODO
