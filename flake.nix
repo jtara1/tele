@@ -11,9 +11,7 @@
       nixosModules.default = { config, lib, ... }: {
         options.services.logs-app = with lib; {
           mdDoc = ''
-            This module provides a configuration for the Logs App service, which is responsible for collecting and managing logs from various sources.
-
-            The Logs App service includes components for log ingestion, storage, and visualization. It integrates with tools like Loki for log storage and Grafana for log visualization.
+            The Logs App service includes components for log ingestion, storage, and visualization.
 
             By enabling this module, you enable several services which include:
               - grafana http://localhost:3010
@@ -21,9 +19,19 @@
               - loki http://localhost:3030
               - promtail http://localhost:3031
 
-            Promtail will ingest logs from:
+            Query for logs from:
               - docker (rootless) containers
               - nginx access logs
+              - journald
+
+            Dashboard included to visualize core computing:
+              - cpu
+              - memory
+              - storage
+              - network
+
+            Alerts to notify of high computing usage for:
+              - memory
           '';
 
           enable = mkOption {
@@ -64,10 +72,7 @@
 
         config = let cfg = config.services.logs-app;
         in lib.mkIf cfg.enable {
-          # source: (forked) https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e
-
-          # prometheus: port 3020
-          #
+          # --- prometheus: port 3020
           services.prometheus = {
             port = 3020;
             enable = true;
@@ -93,8 +98,7 @@
             }];
           };
 
-          # loki: port 3030
-          #
+          # --- loki: port 3030
           services.loki = {
             enable = true;
             configuration = {
@@ -135,8 +139,7 @@
             # user, group, dataDir, extraFlags, (configFile)
           };
 
-          # promtail: port 3031
-          #
+          # --- promtail: port 3031
           services.promtail = {
             enable = true;
             configuration = {
@@ -234,8 +237,7 @@
           # for file permissions to access the log file
           users.users.promtail.extraGroups = [ "nginx" ];
 
-          # grafana: port 3010
-          #
+          # --- grafana: port 3010
           services.grafana = {
             enable = true;
             settings = {
@@ -407,9 +409,9 @@
             };
           };
 
-          # nginx upstreams to alias several services "${ip}:${port}"
-          # note: this is for use within your system nginx config
-          #
+          # --- nginx
+          # nginx upstreams to alias several services
+          # this is for use within your system nginx config
           services.nginx = {
             upstreams = {
               # example usage in context of nginx config: "http://grafana"
