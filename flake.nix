@@ -336,7 +336,7 @@
                     receiver = "alert-receivers";
                     group_by = [ "grafana_folder" "alertname" ];
                     group_wait = "30s";
-                    group_interval = "5m";
+                    group_interval = "1m";
                     repeat_interval = "4h";
                   }];
                 };

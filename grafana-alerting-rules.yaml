@@ -4,7 +4,7 @@ groups:
   - orgId: 1
     name: Core Health
     folder: Node Exporter Alerts
-    interval: 5m
+    interval: 1m
     rules:
       - uid: c0a5f1fe-3435-4c07-abfd-870043d2a654
         title: memory
@@ -61,7 +61,7 @@ groups:
               type: threshold
         noDataState: NoData
         execErrState: Error
-        for: 5m
+        for: 1m
         isPaused: false
       - uid: f4b91d58-7bc1-458a-8c64-4d03b6ab20b0
         title: storage
@@ -115,7 +115,7 @@ groups:
               type: threshold
         noDataState: NoData
         execErrState: Error
-        for: 5m
+        for: 1m
         annotations:
           description: ''
           runbook_url: ''
@@ -137,7 +137,7 @@ groups:
                 type: prometheus
                 uid: PBFA97CFB590B2093
               editorMode: code
-              expr: avg(avg by (cpu) (100 - rate(node_cpu_seconds_total{mode="idle"}[5m]) * 100))
+              expr: avg(avg by (cpu) (100 - rate(node_cpu_seconds_total{mode="idle"}[1m]) * 100))
               instant: true
               intervalMs: 1000
               legendFormat: __auto
@@ -175,7 +175,7 @@ groups:
               type: threshold
         noDataState: NoData
         execErrState: Error
-        for: 5m
+        for: 1m
         annotations:
           description: ""
           runbook_url: ""
