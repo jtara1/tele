@@ -32,6 +32,8 @@
 
             Alerts to notify of high computing usage for:
               - memory
+              - storage
+              - cpu
           '';
 
           enable = mkOption {

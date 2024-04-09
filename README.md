@@ -3,6 +3,17 @@
 automatically ingest logs from (rootless) docker and nginx access logs with dashboard configured to query and visualize
 
 
+## Features
+
+- ingest docker (rootless) container logs
+- ingest nginx access logs
+- query the logs
+- view timeseries graphs for: cpu, memory, storage, & networking
+- receive email alerts when a resource (cpu, memory, or storage) is in high use
+
+You're not required to use docker, nginx, or setup email.
+
+
 ## Requirements
 
 NixOS and Nix Flakes on local host for dev and remote host for usage. 
@@ -58,12 +69,13 @@ in a nix module, enable it with config such as
 
 ### Publish
 
-On host OS and its network, you should expose or redirect to its `localhost:3010`, 
+On host OS and its network, you should expose or redirect to its `http://localhost:3010`, 
 grafana, the dashboard for querying and graphs
 
 ### Security
 
-Add security. Change grafana dashboard password. Allowlist your IP from which you're accessing it. TLS. etc
+Add security. Change grafana dashboard password. Allowlist your IP from which you're accessing it. 
+Encrypt the channel via TLS or other. etc.
 
 
 ## Usage
@@ -76,11 +88,11 @@ username: admin
 password: admin
 ```
 
-You can query logs, create visualizations, load a dashboard. Checkout:
+You can query logs, create visualizations, load a dashboard, or check alerts:
 - Explore
 - Dashboards
   - Node Exporter Full http://localhost:3010/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m
-
+- Alerting
 
 ## TODO
 
@@ -95,12 +107,12 @@ You can query logs, create visualizations, load a dashboard. Checkout:
 - [x] prometheus for system monitoring and metrics
 - [x] 1st alerts rule for memory
 - [x] alert notifications via SMTPS/email
-- [ ] alert rules for core resources: cpu, storage, memory
+- [x] alert rules for core resources: cpu, storage, memory
 - [ ] ingest logs from multiple virtual machines in dedicated logs-app server?
 - [x] fix and test the nginx config for local dev and for my server
 - [ ] refactor into nix module(s) to be more portable for non-flake NixOS users
 - [x] core health dashboard - pre-configured visualization for core resources
-
+- [ ] improve management of email password for ease of secure and declarative use
 
 ## References
 
