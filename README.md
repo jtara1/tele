@@ -114,6 +114,8 @@ You can query logs, create visualizations, load a dashboard, or check alerts:
 - [x] core health dashboard - pre-configured visualization for core resources
 - [ ] improve management of email password for ease of secure and declarative use
 - [x] publish to flakehub
+- [ ] error: timestamp of a queried log is invalid
+- [ ] alerts may need variable datasource uid
 
 
 ## References
