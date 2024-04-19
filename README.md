@@ -1,5 +1,7 @@
 # tele
 
+[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/jtara1/tele/badge)](https://flakehub.com/flake/jtara1/tele)
+
 dashboard and alerts for: system resources and application logs
 
 
