@@ -1,22 +1,22 @@
-# logs-app
+# tele
 
-automatically ingest logs from (rootless) docker and nginx access logs with dashboard configured to query and visualize
+dashboard and alerts for: system resources and application logs
 
 
 ## Features
 
+- view timeseries graphs for: cpu, memory, storage, & networking
+- receive email alerts when a resource (cpu, memory, or storage) is in high use
 - ingest docker (rootless) container logs
 - ingest nginx access logs
 - query the logs
-- view timeseries graphs for: cpu, memory, storage, & networking
-- receive email alerts when a resource (cpu, memory, or storage) is in high use
 
-You're not required to use docker, nginx, or setup email.
+You're not required to use docker, nginx, or setup email (to receive alerts).
 
 
 ## Requirements
 
-NixOS and Nix Flakes on local host for dev and remote host for usage. 
+NixOS and Nix Flakes on remote host for usage. 
 
 
 ## Setup
@@ -34,12 +34,12 @@ promtail should safely fail for its respective scrape job if you're not running 
 
 in your system `flake.nix` `inputs`, add
 ```text
-    logs-app.url = "github:jtara1/logs-app";
+    tele.url = "github:jtara1/tele";
 ```
 
 in your `modules` or an `imports`, append
 ```text
-    inputs.logs-app.nixosModules.default
+    inputs.tele.nixosModules.default
 ```
 where `inputs` is the 1st parameter in the function assigned to `outputs`.
 
@@ -47,13 +47,13 @@ where `inputs` is the 1st parameter in the function assigned to `outputs`.
 
 in a nix module, enable it with config such as
 ```text
-  services.logs-app = {
+  services.tele = {
     enable = true;
     email = {
       host = "mail.example.com:587";
       senderAddress = "admin@example.com";
       receiverAddress = "admin@example.com";
-      secretsFilePath = /etc/logs-app/secrets.json;
+      secretsFilePath = /etc/tele/secrets.json;
     };
   };
 ```
@@ -108,14 +108,16 @@ You can query logs, create visualizations, load a dashboard, or check alerts:
 - [x] 1st alerts rule for memory
 - [x] alert notifications via SMTPS/email
 - [x] alert rules for core resources: cpu, storage, memory
-- [ ] ingest logs from multiple virtual machines in dedicated logs-app server?
+- [ ] ingest logs from multiple virtual machines in dedicated tele server?
 - [x] fix and test the nginx config for local dev and for my server
 - [ ] refactor into nix module(s) to be more portable for non-flake NixOS users
 - [x] core health dashboard - pre-configured visualization for core resources
 - [ ] improve management of email password for ease of secure and declarative use
+- [x] publish to flakehub
+
 
 ## References
 
-- [nix configs: grafana, prometheus, loki using journald as log driver](https://xeiaso.net/blog/prometheus-grafana-loki-nixos-2020-11-20/)
+- [How to Setup Prometheus, Grafana and Loki on NixOS](https://xeiaso.net/blog/prometheus-grafana-loki-nixos-2020-11-20/)
 - [nix config: grafana](https://discourse.nixos.org/t/how-to-use-exported-grafana-dashboard/27739/2?u=jtara1)
 - [pure nix config for all](https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e)
