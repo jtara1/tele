@@ -9,7 +9,7 @@
       pkgsUnstable = import nixpkgs { inherit system; };
     in {
       nixosModules.default = { config, lib, ... }: {
-        options.services.logs-app = with lib; {
+        options.services.tele = with lib; {
           mdDoc = ''
             The Logs App service includes components for log ingestion, storage, and visualization.
 
@@ -61,7 +61,7 @@
 
             secretsFilePath = mkOption {
               type = types.path;
-              example = ./secrets/logs-app.json;
+              example = ./secrets/tele.json;
               description = ''
                 Copy and reference secrets.json.example which contains:
                 {
@@ -72,7 +72,7 @@
           };
         };
 
-        config = let cfg = config.services.logs-app;
+        config = let cfg = config.services.tele;
         in lib.mkIf cfg.enable {
           # --- prometheus: port 3020
           services.prometheus = {
