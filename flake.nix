@@ -1,4 +1,30 @@
 {
+  description = ''
+    The tele service includes components for log ingestion, storage, and visualization.
+
+    By enabling this module, you enable several services which include:
+      - grafana http://localhost:3010
+      - prometheus http://localhost:3020
+      - loki http://localhost:3030
+      - promtail http://localhost:3031
+
+    Query for logs from:
+      - docker (rootless) containers
+      - nginx access logs
+      - journald
+
+    Dashboard included to visualize core computing:
+      - cpu
+      - memory
+      - storage
+      - network
+
+    Alerts to notify of high computing usage for:
+      - memory
+      - storage
+      - cpu
+  '';
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs"; # unstable nixpkgs
   };
@@ -10,37 +36,11 @@
     in {
       nixosModules.default = { config, lib, ... }: {
         options.services.tele = with lib; {
-          mdDoc = ''
-            The Logs App service includes components for log ingestion, storage, and visualization.
-
-            By enabling this module, you enable several services which include:
-              - grafana http://localhost:3010
-              - prometheus http://localhost:3020
-              - loki http://localhost:3030
-              - promtail http://localhost:3031
-
-            Query for logs from:
-              - docker (rootless) containers
-              - nginx access logs
-              - journald
-
-            Dashboard included to visualize core computing:
-              - cpu
-              - memory
-              - storage
-              - network
-
-            Alerts to notify of high computing usage for:
-              - memory
-              - storage
-              - cpu
-          '';
-
           enable = mkOption {
             type = types.bool;
             default = false;
             example = false;
-            description = "Enable the Logs App";
+            description = "Enable the tele service";
           };
 
           email = {
