@@ -26,7 +26,7 @@
   '';
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs"; # unstable nixpkgs
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
