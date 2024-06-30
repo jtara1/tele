@@ -126,7 +126,7 @@
                   from = "2020-01-01";
                   store = "tsdb";
                   object_store = "filesystem";
-                  schema = "v12";
+                  schema = "v13";
                   index = {
                     prefix = "index_";
                     period = "24h";
