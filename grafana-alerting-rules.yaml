@@ -20,8 +20,8 @@ groups:
                 type: prometheus
                 uid: PBFA97CFB590B2093
               editorMode: code
-              expr: 100 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
-                * 100)
+              expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+                * 100
               hide: false
               instant: true
               intervalMs: 1000
