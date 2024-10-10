@@ -283,6 +283,14 @@
                       }";
                   }
                 ];
+                variables = [
+                  {
+                    name = "job";
+                    type = "label_values";
+                    datasource = "Prometheus";
+                    query = "label_values(job)";
+                  }
+                ];
               };
               dashboards.settings = {
                 apiVersion = 1;
