@@ -8,7 +8,7 @@ groups:
     rules:
       - uid: c0a5f1fe-3435-4c07-abfd-870043d2a654
         title: memory
-        condition: A
+        condition: B
         data:
           - refId: A
             relativeTimeRange:
